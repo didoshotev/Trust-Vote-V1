@@ -6,6 +6,8 @@
   "author": "didoshotev <didoshotev@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "ethers": "^5.0.0",
     "hardhat": "^2.13.0"
   }
 }
