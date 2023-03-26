@@ -33,8 +33,18 @@ contract VotingSystem {
 
     event VoteSuccess(uint256 pollId, uint256 optionId, address voter);
 
+    modifier onlyBeforeStart(uint256 pollId) {
+        require(block.timestamp < polls[pollId].startTime, "This action can only be performed before the start time.");
+        _;
+    }
 
-    function createPoll(string memory name, uint256 startTime, uint256 endTime) public {
+    modifier onlyBeforeEnd(uint256 pollId) {
+        require(block.timestamp < polls[pollId].endTime, "This action can only be performed before the end time.");
+        _;
+    }
+
+
+    function createPoll(string memory name, uint256 startTime, uint256 endTime) public onlyBeforeStart(nextPollId) {
         require(startTime < endTime, "End time should be greater than start time.");
 
         polls[nextPollId].id = nextPollId;
@@ -47,7 +57,7 @@ contract VotingSystem {
         nextPollId++;
     }
 
-    function addOption(uint256 pollId, string memory optionName) public {
+    function addOption(uint256 pollId, string memory optionName) public onlyBeforeEnd(pollId) {
         require(msg.sender == polls[pollId].admin, "Only poll admin can add options");
 
         uint optionId = polls[pollId].optionIds.length;
@@ -85,5 +95,9 @@ contract VotingSystem {
 
     function getAllPollIds() public view returns (uint256[] memory) { 
         return pollIds;
+    }
+
+    function getPollDetails(uint256 pollId) public view returns(string memory name, uint256 startTime, uint256 endTime) {
+        return (polls[pollId].name, polls[pollId].startTime, polls[pollId].endTime);
     }
 }
