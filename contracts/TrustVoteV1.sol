@@ -5,15 +5,14 @@ pragma solidity >=0.7.0 <0.9.0;
 import "hardhat/console.sol";
 
 
-contract VotingSystem {
-    // structure for each option in a poll
+contract TrustVoteV1 {
     struct Option {
         uint256 id;
         uint256 count;
         string name;
     }
 
-    // structure for each poll
+
     struct Poll {
         uint256 id;
         address admin;
@@ -31,6 +30,7 @@ contract VotingSystem {
 
     uint256 nextPollId = 0;
 
+    event PollCreated(uint256 pollId, uint256 startTime, uint256 endTime);
     event VoteSuccess(uint256 pollId, uint256 optionId, address voter);
 
     modifier onlyBeforeStart(uint256 pollId) {
@@ -43,8 +43,13 @@ contract VotingSystem {
         _;
     }
 
+    modifier onlyPollAdmin(uint256 pollId) {
+        require(msg.sender == polls[pollId].admin, "Only poll admin can perform this action");
+        _;
+    }
 
-    function createPoll(string memory name, uint256 startTime, uint256 endTime) public onlyBeforeStart(nextPollId) {
+
+    function createPoll(string memory name, uint256 startTime, uint256 endTime) public {
         require(startTime < endTime, "End time should be greater than start time.");
 
         polls[nextPollId].id = nextPollId;
@@ -54,11 +59,13 @@ contract VotingSystem {
         polls[nextPollId].endTime = endTime;
 
         pollIds.push(nextPollId);
+        emit PollCreated(nextPollId, startTime, endTime);
         nextPollId++;
     }
 
-    function addOption(uint256 pollId, string memory optionName) public onlyBeforeEnd(pollId) {
+    function addOption(uint256 pollId, string memory optionName) public onlyPollAdmin(pollId) onlyBeforeEnd(pollId) {
         require(msg.sender == polls[pollId].admin, "Only poll admin can add options");
+        require(polls[pollId].id == pollId, "Poll with the given ID does not exist");
 
         uint optionId = polls[pollId].optionIds.length;
         polls[pollId].optionIds.push(optionId);
@@ -74,6 +81,7 @@ contract VotingSystem {
         require(block.timestamp <= polls[pollId].endTime, "The poll has ended");
         require(!polls[pollId].voted[msg.sender], "You have already voted in this poll");
         require(optionId < polls[pollId].optionIds.length, "Invalid option ID");
+        require(polls[pollId].id == pollId, "Poll with the given ID does not exist");
         
         polls[pollId].options[optionId].count++;
         polls[pollId].voted[msg.sender] = true;
@@ -82,6 +90,8 @@ contract VotingSystem {
     }
 
     function getPollResult(uint256 pollId) public view returns (uint256[] memory counts, string[] memory optionNames) {
+        require(polls[pollId].id == pollId, "Poll with the given ID does not exist");
+        
         uint256 optionCount = polls[pollId].optionIds.length;
         counts = new uint256[](optionCount);
         optionNames = new string[](optionCount);
@@ -98,6 +108,7 @@ contract VotingSystem {
     }
 
     function getPollDetails(uint256 pollId) public view returns(string memory name, uint256 startTime, uint256 endTime) {
+        require(polls[pollId].id == pollId, "Poll with the given ID does not exist");
         return (polls[pollId].name, polls[pollId].startTime, polls[pollId].endTime);
     }
 }
