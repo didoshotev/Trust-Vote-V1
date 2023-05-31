@@ -15,6 +15,7 @@ contract TrustVoteV1 {
         uint256 id;
         address admin;
         string name;
+        string description;
         uint256 startTime;
         uint256 endTime;
         bool isActive;
@@ -57,6 +58,7 @@ contract TrustVoteV1 {
 
     function createPoll(
         string memory name,
+        string memory description,
         uint256 startTime,
         uint256 endTime
     ) public {
@@ -68,6 +70,7 @@ contract TrustVoteV1 {
         polls[nextPollId].id = nextPollId;
         polls[nextPollId].admin = msg.sender;
         polls[nextPollId].name = name;
+        polls[nextPollId].description = description;
         polls[nextPollId].startTime = startTime;
         polls[nextPollId].endTime = endTime;
 
