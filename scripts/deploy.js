@@ -17,6 +17,10 @@ async function main() {
   const contractABI = contractArtifact.abi;
   const updatedABI = JSON.stringify(contractABI, null, 4);
 
+  const TrustVoteV1Deployment = await ethers.getContractAt("TrustVoteV1", trustVoteV1.address); // Replace "CONTRACT_ADDRESS_HERE" with the actual contract address
+  const pollIds = await TrustVoteV1Deployment.getAllPollIds();
+  console.log("Poll IDs:", pollIds);
+
   const contractInfo = {
     address: trustVoteV1.address,
     abi: contractABI,

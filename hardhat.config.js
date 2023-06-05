@@ -17,7 +17,7 @@ const users = [
 ]
 
 module.exports = {
-  defaultNetwork: "hardhat",
+  defaultNetwork: "localhost",
   solidity: {
     version: "0.8.18",
     settings: {
@@ -30,8 +30,9 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
+        enabled: false,
         url: `https://mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-        blockNumber: 17316577,
+        // blockNumber: 17316577,
       },
       accounts: users
     },

@@ -79,10 +79,11 @@ contract TrustVoteV1 {
         nextPollId++;
     }
 
+    // add onlyBeforeEnd(pollId)
     function addOption(
         uint256 pollId,
         string memory optionName
-    ) public onlyPollAdmin(pollId) onlyBeforeEnd(pollId) {
+    ) public onlyPollAdmin(pollId) {
         require(
             msg.sender == polls[pollId].admin,
             "Only poll admin can add options"
@@ -152,7 +153,20 @@ contract TrustVoteV1 {
 
     function getPollDetails(
         uint256 pollId
-    ) public view returns (uint256[] memory, uint256[] memory, string memory name, uint256 startTime, uint256 endTime, bool isActive, address admin) {
+    )
+        public
+        view
+        returns (
+            string memory name,
+            string memory description,
+            uint256 startTime,
+            uint256 endTime,
+            address admin,
+            bool isActive,
+            uint256[] memory,
+            uint256[] memory
+        )
+    {
         Poll storage poll = polls[pollId];
 
         uint256[] memory optionIds = new uint256[](poll.optionIds.length);
@@ -164,6 +178,15 @@ contract TrustVoteV1 {
             voteCounts[i] = option.count;
         }
 
-        return (optionIds, voteCounts, poll.name, poll.startTime, poll.endTime, poll.isActive, poll.admin);
+        return (
+            poll.name,
+            poll.description,
+            poll.startTime,
+            poll.endTime,
+            poll.admin,
+            poll.isActive,
+            optionIds,
+            voteCounts
+        );
     }
 }

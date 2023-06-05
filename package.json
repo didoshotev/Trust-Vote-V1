@@ -17,6 +17,7 @@
     "dotenv": "^16.0.3"
   },
   "scripts": {
-    "start-fork": "yarn hardhat node && yarn hardhat run scripts/deploy.js"
+    "start-fork": "yarn hardhat node && yarn hardhat run scripts/deploy.js",
+    "generate-data": "yarn hardhat run scripts/deploy.js"
   }
 }
